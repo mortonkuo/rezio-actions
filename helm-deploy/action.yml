@@ -1,0 +1,77 @@
+name: Helm deploy
+description: 'Deploy helm chart to cluster'
+
+inputs:
+  helm_version:
+    description: "Helm version"
+    required: false
+    default: 'v3.9.3'
+  cluster:
+    description: "Cluster name"
+    required: true
+  release:
+    description: "Release name"
+    required: true
+  chart:
+    description: "Chart name"
+    required: false
+    default: 'skateboard'
+  namespace:
+    description: "Namespace of env"
+    required: true
+  tag:
+    description: "Image tag"
+    required: false
+    default: 'latest'
+  values_path:
+    description: "Path of values.yaml"
+    required: true
+  aws-access-key-id:
+    description: >-
+      AWS Access Key ID. This input is required if running in the GitHub hosted environment.
+      It is optional if running in a self-hosted environment that already has AWS credentials,
+      for example on an EC2 instance.
+    required: true
+  aws-secret-access-key:
+    description: >-
+      AWS Secret Access Key. This input is required if running in the GitHub hosted environment.
+      It is optional if running in a self-hosted environment that already has AWS credentials,
+      for example on an EC2 instance.
+    required: true
+  aws-region:
+    description: 'AWS Region, e.g. ap-southeast-1'
+    required: false
+    default: 'ap-southeast-1'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: ${{ inputs.helm_version }}
+
+    - name: Install AWS Cli
+      uses: quipper/setup-aws-cli-action@main
+
+    - name: Generate kubeconfig
+      shell: bash
+      run: aws eks update-kubeconfig --name ${{ inputs.cluster }}
+
+    - name: Helm deploy
+      shell: bash
+      run: |
+        helm repo add rezio https://kkday-it.github.io/rezio-helm-charts
+        
+        helm upgrade ${{ inputs.release }} ${{ inputs.chart }} \
+          --wait --atomic --install \
+          --namespace ${{ inputs.namespace }} \
+          --values ${{ inputs.values_path }} \
+          --set image.tag=${{ inputs.tag }}
