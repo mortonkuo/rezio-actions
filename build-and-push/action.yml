@@ -27,6 +27,10 @@ inputs:
   platforms:
     description: "List of target platforms for build"
     required: false
+  context:
+    description: "Create new Context for builder"
+    required: false
+    default: 'true'
 
 runs:
   using: "composite"
@@ -35,6 +39,7 @@ runs:
       uses: docker/setup-qemu-action@v2
 
     - name: Set up Docker Context for Buildx
+      if: ${{ inputs.context == 'true' }}
       shell: bash
       run: docker context create builders
 
