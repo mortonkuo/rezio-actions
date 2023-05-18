@@ -86,6 +86,6 @@ runs:
       shell: bash
       if: ${{ inputs.helmfile == 'true' }}
       run: |
-        helmfile deps
+        helmfile -f ${{ inputs.values_path }} deps
         IMAGE_TAG=${{ inputs.tag }} helmfile -f ${{ inputs.values_path }} \
           --environment ${{ inputs.namespace }} apply
