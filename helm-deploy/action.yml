@@ -5,7 +5,11 @@ inputs:
   helm_version:
     description: "Helm version"
     required: false
-    default: 'v3.9.3'
+    default: 'v3.11.1'
+  helmfile:
+    description: "Enable helmfile"
+    required: false
+    default: 'false'
   cluster:
     description: "Cluster name"
     required: true
@@ -53,10 +57,11 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: ${{ inputs.aws-region }}
 
-    - name: Install Helm
-      uses: azure/setup-helm@v3
+    - name: Setup Helmfile
+      uses: mamezou-tech/setup-helmfile@v1.2.0
       with:
-        version: ${{ inputs.helm_version }}
+        helm-version: ${{ inputs.helm_version }}
+        helmfile-version: v0.151.0
 
     - name: Install AWS Cli
       uses: quipper/setup-aws-cli-action@main
@@ -67,6 +72,7 @@ runs:
 
     - name: Helm deploy
       shell: bash
+      if: ${{ inputs.helmfile == 'false' }}
       run: |
         helm repo add rezio https://kkday-it.github.io/rezio-helm-charts
         
@@ -75,3 +81,11 @@ runs:
           --namespace ${{ inputs.namespace }} \
           --values ${{ inputs.values_path }} \
           --set image.tag=${{ inputs.tag }}
+
+    - name: Helmfile deploy
+      shell: bash
+      if: ${{ inputs.helmfile == 'true' }}
+      run: |
+        helmfile deps
+        IMAGE_TAG=${{ inputs.tag }} helmfile -f ${{ inputs.values_path }} \
+          --environment ${{ inputs.namespace }} apply
