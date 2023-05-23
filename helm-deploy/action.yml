@@ -57,8 +57,15 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: ${{ inputs.aws-region }}
 
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      if: ${{ inputs.helmfile == 'false' }}
+      with:
+        version: ${{ inputs.helm_version }}
+
     - name: Setup Helmfile
       uses: mamezou-tech/setup-helmfile@v1.2.0
+      if: ${{ inputs.helmfile == 'true' }}
       with:
         helm-version: ${{ inputs.helm_version }}
         helmfile-version: v0.151.0
