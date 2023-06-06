@@ -31,6 +31,9 @@ inputs:
     description: "Create new Context for builder"
     required: false
     default: 'true'
+  target:
+    description: "Sets the target stage to build"
+    required: false
 
 runs:
   using: "composite"
@@ -72,3 +75,4 @@ runs:
         cache-from: ${{ inputs.cache-from }}
         cache-to: type=inline
         platforms: ${{ inputs.platforms }}
+        target: ${{ inputs.target }}
