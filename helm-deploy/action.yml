@@ -106,7 +106,10 @@ runs:
     - name: Helmfile deploy
       shell: bash
       if: ${{ inputs.helmfile == 'true' }}
+      env:
+        IMAGE_TAG: ${{ inputs.tag }}
       run: |
-        helmfile -f ${{ inputs.values_path }} deps
-        IMAGE_TAG=${{ inputs.tag }} helmfile -f ${{ inputs.values_path }} \
-          --environment ${{ inputs.namespace }} apply
+        helmfile apply \
+          --file ${{ inputs.values_path }} \
+          --environment ${{ inputs.namespace }} \
+          --selector name=${{ inputs.release }}
