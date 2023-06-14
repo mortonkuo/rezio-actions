@@ -47,7 +47,10 @@ runs:
     - name: Set up Docker Context for Buildx
       if: ${{ inputs.context == 'true' }}
       shell: bash
-      run: docker context create builders
+      run: |
+        if ! [[ $(docker context ls) =~ builders ]]; then
+          docker context create builders
+        fi
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
