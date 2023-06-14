@@ -31,6 +31,9 @@ inputs:
     description: "Create new Context for builder"
     required: false
     default: 'true'
+  context_path:
+    description: "Build's context is the set of files located in the specified PATH or URL"
+    required: false
   target:
     description: "Sets the target stage to build"
     required: false
@@ -96,3 +99,4 @@ runs:
         cache-to: type=inline
         platforms: ${{ inputs.platforms }}
         target: ${{ inputs.target }}
+        context: ${{ inputs.context_path }}
