@@ -15,7 +15,7 @@ inputs:
     required: true
   release:
     description: "Release name"
-    required: true
+    required: false
   chart:
     description: "Chart name"
     required: false
@@ -103,9 +103,29 @@ runs:
           --values ${{ inputs.values_path }} \
           --set image.tag=${{ inputs.tag }}
 
+    - name: Helmfile deploy all release
+      shell: bash
+      if: ${{ inputs.helmfile == 'true' && inputs.release == '' }}
+      env:
+        IMAGE_TAG: ${{ inputs.tag }}
+      run: |
+        helmfile apply \
+          --file ${{ inputs.values_path }} \
+          --environment ${{ inputs.namespace }}
+
+    - name: Helmfile deploy all release
+      shell: bash
+      if: ${{ inputs.helmfile == 'true' && inputs.release == '' }}
+      env:
+        IMAGE_TAG: ${{ inputs.tag }}
+      run: |
+        helmfile apply \
+          --file ${{ inputs.values_path }} \
+          --environment ${{ inputs.namespace }}
+
     - name: Helmfile deploy
       shell: bash
-      if: ${{ inputs.helmfile == 'true' }}
+      if: ${{ inputs.helmfile == 'true' && inputs.release != '' }}
       env:
         IMAGE_TAG: ${{ inputs.tag }}
       run: |
