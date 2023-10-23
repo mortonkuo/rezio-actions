@@ -5,11 +5,15 @@ inputs:
   helm_version:
     description: "Helm version"
     required: false
-    default: 'v3.11.1'
+    default: 'v3.13.1'
   helmfile:
     description: "Enable helmfile"
     required: false
     default: 'false'
+  install-helm-plugins:
+    description: "Install Helm plugins"
+    required: false
+    default: 'yes'
   cluster:
     description: "Cluster name"
     required: true
@@ -82,7 +86,7 @@ runs:
       if: ${{ inputs.helmfile == 'true' }}
       with:
         helm-version: ${{ inputs.helm_version }}
-        helmfile-version: v0.151.0
+        install-helm-plugins: ${{ inputs.install-helm-plugins }}
 
     - name: Install AWS Cli
       uses: quipper/setup-aws-cli-action@main
