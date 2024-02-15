@@ -61,7 +61,7 @@ runs:
   using: "composite"
   steps:
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       if: ${{ inputs.aws-access-key-id != '' && inputs.aws-secret-access-key != '' }}
       with:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
@@ -69,20 +69,20 @@ runs:
         aws-region: ${{ inputs.aws-region }}
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       if: ${{ inputs.aws-access-key-id == '' && inputs.aws-secret-access-key == '' }}
       with:
         role-to-assume: ${{ inputs.role-to-assume }}
         aws-region: ${{ inputs.aws-region }}
 
     - name: Setup Helm
-      uses: azure/setup-helm@v3
+      uses: azure/setup-helm@v4.0.0
       if: ${{ inputs.helmfile == 'false' }}
       with:
         version: ${{ inputs.helm_version }}
 
     - name: Setup Helmfile
-      uses: mamezou-tech/setup-helmfile@v1.2.0
+      uses: mamezou-tech/setup-helmfile@v2.0.0
       if: ${{ inputs.helmfile == 'true' }}
       with:
         helm-version: ${{ inputs.helm_version }}
@@ -106,16 +106,6 @@ runs:
           --namespace ${{ inputs.namespace }} \
           --values ${{ inputs.values_path }} \
           --set image.tag=${{ inputs.tag }}
-
-    - name: Helmfile deploy all release
-      shell: bash
-      if: ${{ inputs.helmfile == 'true' && inputs.release == '' }}
-      env:
-        IMAGE_TAG: ${{ inputs.tag }}
-      run: |
-        helmfile apply \
-          --file ${{ inputs.values_path }} \
-          --environment ${{ inputs.namespace }}
 
     - name: Helmfile deploy all release
       shell: bash
