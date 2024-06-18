@@ -37,6 +37,12 @@ inputs:
   target:
     description: "Sets the target stage to build"
     required: false
+  role-to-assume:
+    description: >-
+      Use the provided credentials to assume an IAM role and configure the Actions
+      environment with the assumed role credentials rather than with the provided
+      credentials
+    required: false
 
 runs:
   using: "composite"
